@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div class="flex items-center justify-center min-h-screen">
+      <div
+        class="w-full sm:w-3/4 md:w-1/2 lg:w-[80%] bg-white p-6 rounded-xl shadow-lg"
+      >
+        <form id="form" class="space-y-4">
+          <div class="flex flex-col space-y-2">
+            <label class="font-semibold" for="name">Seu nome</label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Digite seu nome"
+              class="p-3 border border-gray-300 rounded-md w-full"
+              required
+            />
+          </div>
+
+          <div class="flex flex-col space-y-2">
+            <label class="font-semibold" for="email">Seu melhor e-mail</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Digite seu e-mail"
+              class="p-3 border border-gray-300 rounded-md w-full"
+              required
+            />
+          </div>
+
+          <div class="flex flex-col space-y-2">
+            <label class="font-semibold" for="association"
+              >Nome da sua empresa</label
+            >
+            <input
+              id="association"
+              type="text"
+              placeholder="Digite o nome da empresa"
+              class="p-3 border border-gray-300 rounded-md w-full"
+              required
+            />
+          </div>
+
+          <div class="flex flex-col space-y-2">
+            <label class="font-semibold" for="phone">Telefone</label>
+            <input
+              id="phone"
+              type="tel"
+              placeholder="(99) 9 9999-9999"
+              class="p-3 border border-gray-300 rounded-md w-full"
+              maxlength="16"
+              required
+            />
+          </div>
+
+          <div class="flex flex-col space-y-2">
+            <label class="font-semibold" for="role">Você é:</label>
+            <select
+              id="role"
+              class="p-3 border border-gray-300 rounded-md w-full"
+              onchange="handleRoleChange()"
+            >
+              <option value="">Selecione seu cargo</option>
+              <option value="Vendedor">Vendedor</option>
+              <option value="Gerente">Gerente</option>
+              <option value="Dono">Dono</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+
+          <div id="faturamento-section" class="hidden flex flex-col space-y-4">
+            <label class="font-semibold"
+              >Qual é o faturamento mensal da sua empresa?</label
+            >
+            <select
+              id="faturamento"
+              class="p-3 border border-gray-300 rounded-md w-full"
+            >
+              <option value="">Selecione</option>
+              <option value="Até 20 mil">Até 20 mil</option>
+              <option value="De 21 mil até 60 mil">De 21 mil até 60 mil</option>
+              <option value="De 61 mil até 100 mil">
+                De 61 mil até 100 mil
+              </option>
+              <option value="De 101 mil até 400 mil">
+                De 101 mil até 400 mil
+              </option>
+              <option value="De 401 mil até 1 milhão">
+                De 401 mil até 1 milhão
+              </option>
+              <option value="Mais de 1 milhão">Mais de 1 milhão</option>
+            </select>
+          </div>
+
+          <!-- Campos ocultos para UTMs -->
+          <input type="hidden" id="utm_source" name="utm_source" />
+          <input type="hidden" id="utm_medium" name="utm_medium" />
+          <input type="hidden" id="utm_campaign" name="utm_campaign" />
+          <input type="hidden" id="utm_content" name="utm_content" />
+          <input type="hidden" id="utm_term" name="utm_term" />
+
+          <div>
+            <button
+              type="submit"
+              class="w-full bg-sky-500 text-white py-2 px-4 rounded-md font-bold"
+            >
+              Enviar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let formData = {
+        name: "",
+        email: "",
+        association: "",
+        phone: "",
+        role: "",
+        faturamento: "",
+        utm_source: "",
+        utm_medium: "",
+        utm_campaign: "",
+        utm_content: "",
+        utm_term: "",
+      };
+
+      // Função para capturar UTMs da URL e preencher campos do formulário
+      function getUTMParameters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        formData.utm_source = urlParams.get("utm_source") || "";
+        formData.utm_medium = urlParams.get("utm_medium") || "";
+        formData.utm_campaign = urlParams.get("utm_campaign") || "";
+        formData.utm_content = urlParams.get("utm_content") || "";
+        formData.utm_term = urlParams.get("utm_term") || "";
+
+        document.getElementById("utm_source").value = formData.utm_source;
+        document.getElementById("utm_medium").value = formData.utm_medium;
+        document.getElementById("utm_campaign").value = formData.utm_campaign;
+        document.getElementById("utm_content").value = formData.utm_content;
+        document.getElementById("utm_term").value = formData.utm_term;
+      }
+
+      // Função para formatar e validar o número de telefone
+      const phoneInput = document.getElementById("phone");
+      phoneInput.addEventListener("input", function (e) {
+        const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+        formData.phone = value;
+        let formatted = value;
+        if (value.length > 2)
+          formatted = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+        if (value.length > 7)
+          formatted = `(${value.slice(0, 2)}) ${value.slice(
+            2,
+            7
+          )}-${value.slice(7)}`;
+        phoneInput.value = formatted;
+      });
+
+      // Função para exibir campo de faturamento para Gerente ou Dono
+      function handleRoleChange() {
+        const role = document.getElementById("role").value;
+        formData.role = role;
+        document
+          .getElementById("faturamento-section")
+          .classList.toggle("hidden", !(role === "Gerente" || role === "Dono"));
+      }
+
+      // Função de envio do formulário
+      document.getElementById("form").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        formData.name = document.getElementById("name").value;
+        formData.email = document.getElementById("email").value;
+        formData.association = document.getElementById("association").value;
+        formData.phone = document.getElementById("phone").value;
+
+        // Verifica existência de whatsapp
+        const formatedPhone = formData.phone
+          .replaceAll(" ", "")
+          .replaceAll("(", "")
+          .replaceAll(")", "")
+          .replaceAll("-", "");
+        fetch(
+          `https://api.z-api.io/instances/3D7852425F8E40FF893D3E72838DD104/token/FCDA52D325CCCDC22CD583EB/phone-exists/55${formatedPhone}`,
+          {
+            headers: {
+              "Client-Token": "F9aa89bc6dedc4b998458decc01365a7aS",
+            },
+          }
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data.exists) {
+              alert("Seu número precisa estar cadastrado no WhatsApp");
+              return;
+            }
+          });
+
+        // Verifica quantidade de faturamento se for Gerente ou Dono
+        if (formData.role === "Gerente" || formData.role === "Dono") {
+          const faturamento = document.getElementById("faturamento").value;
+          if (!faturamento) {
+            alert("Preencha a quantidade de faturamento.");
+            return;
+          }
+          formData.faturamento = faturamento;
+        }
+
+        fetch("https://hook.us1.make.com/u0cqvi0ctepk2yxr282sdb8kt13k6moq", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }).then(() => {
+          switch (formData.role) {
+            case "Gerente":
+              window.location.href =
+                "https://convergencia.aegmedia.com.br/reuniao/obrigado-call";
+              break;
+            case "Dono":
+              window.location.href =
+                "https://convergencia.aegmedia.com.br/reuniao/obrigado-call";
+              break;
+            case "Outro":
+              window.location.href =
+                "https://convergencia.aegmedia.com.br/reuniao/obrigado-mci";
+              break;
+            default:
+              window.location.href =
+                "https://convergencia.aegmedia.com.br/reuniao/obrigado-ebook";
+              break;
+          }
+        });
+      });
+
+      // Chama a função para capturar UTMs quando a página carrega
+      window.onload = getUTMParameters;
+    </script>
+  </body>
+</html>
